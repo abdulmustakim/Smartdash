@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SmartDash — India's All-in-One Digital Workspace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="style.css"/>
+</head>
+<body class="dark-mode">
+
+<canvas id="bgCanvas"></canvas>
+
+<div id="appScreen" class="screen active">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar glass-card" id="sidebar">
+    <div class="sidebar-logo">
+      <span class="logo-icon">⚡</span>
+      <span class="logo-text sidebar-logo-text">SmartDash</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="nav-item active" data-page="dashboard" onclick="switchPage('dashboard',this)">
+        <span class="nav-icon">🏠</span><span class="nav-label">Dashboard</span>
+      </a>
+      <a class="nav-item" data-page="government" onclick="switchPage('government',this)">
+        <span class="nav-icon">🏛️</span><span class="nav-label">Government</span>
+      </a>
+      <a class="nav-item" data-page="banking" onclick="switchPage('banking',this)">
+        <span class="nav-icon">🏦</span><span class="nav-label">Banking</span>
+      </a>
+      <a class="nav-item" data-page="education" onclick="switchPage('education',this)">
+        <span class="nav-icon">🎓</span><span class="nav-label">Education</span>
+      </a>
+      <a class="nav-item" data-page="tools" onclick="switchPage('tools',this)">
+        <span class="nav-icon">🛠️</span><span class="nav-label">Tools</span>
+      </a>
+      <a class="nav-item" data-page="ai" onclick="switchPage('ai',this)">
+        <span class="nav-icon">🤖</span><span class="nav-label">AI Hub</span>
+      </a>
+      <a class="nav-item" data-page="daily" onclick="switchPage('daily',this)">
+        <span class="nav-icon">🌐</span><span class="nav-label">Daily Use</span>
+      </a>
+      <a class="nav-item" data-page="favorites" onclick="switchPage('favorites',this)">
+        <span class="nav-icon">⭐</span><span class="nav-label">Favorites</span>
+        <span class="nav-badge" id="favCount">0</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <a class="nav-item" data-page="admin" onclick="switchPage('admin',this)">
+        <span class="nav-icon">🛡️</span><span class="nav-label">Admin</span>
+      </a>
+      <a class="nav-item" data-page="settings" onclick="switchPage('settings',this)">
+        <span class="nav-icon">⚙️</span><span class="nav-label">Settings</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-wrap">
+
+    <!-- TOP NAVBAR -->
+    <header class="topbar glass-card">
+      <button class="menu-btn" id="menuBtn" onclick="toggleSidebar()">☰</button>
+      <div class="search-bar">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="globalSearch" placeholder="Search portals, tools, services…" oninput="handleSearch(this.value)"/>
+        <kbd>Ctrl+K</kbd>
+      </div>
+      <div class="topbar-right">
+        <button class="icon-btn" onclick="toggleTheme()" title="Toggle Theme" id="themeBtn">🌙</button>
+        <button class="icon-btn notif-btn" onclick="switchPage('notifications',this)">
+          🔔<span class="notif-dot"></span>
+        </button>
+        <div class="user-chip" onclick="switchPage('profile',document.querySelector('[data-page=profile]'))">
+          <div class="user-avatar" id="userAvatar">S</div>
+          <span class="user-name" id="userName">SmartDash</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- PAGES -->
+    <main class="page-area">
+
+      <div class="search-results" id="searchResults"></div>
+
+      <!-- ── DASHBOARD PAGE ── -->
+      <div class="page active" id="page-dashboard">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Good <span id="greeting">Morning</span>, <span id="welcomeName">Explorer</span> 👋</h1>
+            <p class="page-sub" id="currentDateTime">Loading time…</p>
+          </div>
+          <div class="header-stats">
+            <div class="stat-chip"><span>⭐</span><span id="statFav">0 Favorites</span></div>
+            <div class="stat-chip"><span>🕐</span><span id="statRecent">0 Recent</span></div>
+          </div>
+        </div>
+        <div class="stats-row">
+          <div class="stat-card glass-card">
+            <div class="stat-icon" style="background:#4fc3f722">🏛️</div>
+            <div><div class="stat-num" id="countGov">8</div><div class="stat-lbl">Gov Portals</div></div>
+          </div>
+          <div class="stat-card glass-card">
+            <div class="stat-icon" style="background:#ef535022">🏦</div>
+            <div><div class="stat-num" id="countBank">8</div><div class="stat-lbl">Banks</div></div>
+          </div>
+          <div class="stat-card glass-card">
+            <div class="stat-icon" style="background:#66bb6a22">🛠️</div>
+            <div><div class="stat-num" id="countTools">8</div><div class="stat-lbl">Tools</div></div>
+          </div>
+          <div class="stat-card glass-card">
+            <div class="stat-icon" style="background:#ffa72622">🤖</div>
+            <div><div class="stat-num" id="countAI">6</div><div class="stat-lbl">AI Tools</div></div>
+          </div>
+        </div>
+        <div class="section-header">
+          <h2 class="section-title">🕐 Recently Used</h2>
+        </div>
+        <div class="portal-grid small-grid" id="recentGrid">
+          <div class="empty-state">No recent activity yet. Start exploring!</div>
+        </div>
+        <div id="allCategoriesPreview"></div>
+      </div>
+
+      <!-- ── GOVERNMENT PAGE ── -->
+      <div class="page" id="page-government">
+        <div class="page-header">
+          <h1 class="page-title">🏛️ Government Services</h1>
+          <p class="page-sub">Access Indian government portals securely</p>
+        </div>
+        <div class="portal-grid" id="govGrid"></div>
+      </div>
+
+      <!-- ── BANKING PAGE ── -->
+      <div class="page" id="page-banking">
+        <div class="page-header">
+          <h1 class="page-title">🏦 Banking Services</h1>
+          <p class="page-sub">Net banking, UPI and payment portals</p>
+        </div>
+        <div class="portal-grid" id="bankGrid"></div>
+      </div>
+
+      <!-- ── EDUCATION PAGE ── -->
+      <div class="page" id="page-education">
+        <div class="page-header">
+          <h1 class="page-title">🎓 Education Portals</h1>
+          <p class="page-sub">Online learning, scholarships and academic resources</p>
+        </div>
+        <div class="portal-grid" id="eduGrid"></div>
+      </div>
+
+      <!-- ── TOOLS PAGE ── -->
+      <div class="page" id="page-tools">
+        <div class="page-header">
+          <h1 class="page-title">🛠️ Utility Tools</h1>
+          <p class="page-sub">File converters, generators and productivity tools</p>
+        </div>
+        <div class="portal-grid" id="toolGrid"></div>
+        <div class="tool-panel glass-card" id="qrPanel" style="display:none">
+          <h3>📲 QR Code Generator</h3>
+          <input type="text" id="qrInput" placeholder="Enter URL or text…" class="tool-input"/>
+          <button class="btn-primary" onclick="generateQR()"><span>Generate QR</span></button>
+          <div id="qrOutput"></div>
+        </div>
+      </div>
+
+      <!-- ── AI HUB PAGE ── -->
+      <div class="page" id="page-ai">
+        <div class="page-header">
+          <h1 class="page-title">🤖 AI Hub</h1>
+          <p class="page-sub">Access top AI tools and assistants</p>
+        </div>
+        <div class="ai-banner glass-card">
+          <div class="ai-banner-text">
+            <h3>💡 Try AI-Powered Search</h3>
+            <p>Ask anything and get intelligent answers using Claude AI</p>
+          </div>
+          <button class="btn-primary" onclick="openAIChat()"><span>Open AI Chat ✨</span></button>
+        </div>
+        <div class="portal-grid" id="aiGrid"></div>
+      </div>
+
+      <!-- ── DAILY USE PAGE ── -->
+      <div class="page" id="page-daily">
+        <div class="page-header">
+          <h1 class="page-title">🌐 Daily Use</h1>
+          <p class="page-sub">Your everyday digital tools in one place</p>
+        </div>
+        <div class="portal-grid" id="dailyGrid"></div>
+      </div>
+
+      <!-- ── FAVORITES PAGE ── -->
+      <div class="page" id="page-favorites">
+        <div class="page-header">
+          <h1 class="page-title">⭐ Favorites</h1>
+          <p class="page-sub">Your bookmarked portals and tools</p>
+        </div>
+        <div class="portal-grid" id="favGrid">
+          <div class="empty-state">No favorites yet. Click ⭐ on any portal card to add!</div>
+        </div>
+      </div>
+
+      <!-- ── PROFILE PAGE ── -->
+      <div class="page" id="page-profile">
+        <div class="page-header">
+          <h1 class="page-title">👤 My Profile</h1>
+        </div>
+        <div class="profile-layout">
+          <div class="profile-card glass-card">
+            <div class="profile-avatar" id="profileAvatar">S</div>
+            <h2 id="profileName">SmartDash User</h2>
+            <p id="profileEmail" style="color:var(--muted)">Local Mode</p>
+            <div class="profile-badges">
+              <span class="badge badge-blue">✅ Active</span>
+              <span class="badge badge-green">🟢 Online</span>
+            </div>
+            <button class="btn-primary" style="margin-top:20px" onclick="editProfile()"><span>✏️ Edit Name</span></button>
+          </div>
+          <div class="profile-info glass-card">
+            <h3>Account Information</h3>
+            <div class="info-row"><span>👤 Name</span><span id="infoEmail">SmartDash User</span></div>
+            <div class="info-row"><span>📅 Session Started</span><span id="joinDate">—</span></div>
+            <div class="info-row"><span>🌍 Region</span><span>India 🇮🇳</span></div>
+            <div class="info-row"><span>⭐ Favorites Saved</span><span id="infoFavCount">0</span></div>
+            <h3 style="margin-top:24px">Data</h3>
+            <button class="btn-ghost btn-danger" onclick="clearData()">🗑️ Clear Favorites & History</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SETTINGS PAGE ── -->
+      <div class="page" id="page-settings">
+        <div class="page-header">
+          <h1 class="page-title">⚙️ Settings</h1>
+        </div>
+        <div class="settings-grid">
+          <div class="settings-card glass-card">
+            <h3>🎨 Appearance</h3>
+            <div class="setting-row">
+              <span>Dark Mode</span>
+              <label class="toggle"><input type="checkbox" id="darkToggle" checked onchange="toggleTheme()"/><span class="toggle-slider"></span></label>
+            </div>
+            <div class="setting-row">
+              <span>Compact View</span>
+              <label class="toggle"><input type="checkbox" onchange="toggleCompact(this)"/><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+          <div class="settings-card glass-card">
+            <h3>🔔 Notifications</h3>
+            <div class="setting-row"><span>Push Notifications</span><label class="toggle"><input type="checkbox" checked/><span class="toggle-slider"></span></label></div>
+          </div>
+          <div class="settings-card glass-card">
+            <h3>📊 Dashboard</h3>
+            <div class="setting-row"><span>Show Recent</span><label class="toggle"><input type="checkbox" checked/><span class="toggle-slider"></span></label></div>
+            <button class="btn-ghost" style="margin-top:12px" onclick="clearData()">🗑️ Clear Favorites & History</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── NOTIFICATIONS PAGE ── -->
+      <div class="page" id="page-notifications">
+        <div class="page-header">
+          <h1 class="page-title">🔔 Notifications</h1>
+        </div>
+        <div class="notif-list glass-card" id="notifList"></div>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           🛡️ ADMIN PAGE
+      ══════════════════════════════════════════ -->
+      <div class="page" id="page-admin">
+        <div class="page-header">
+          <h1 class="page-title">🛡️ Admin Panel</h1>
+          <p class="page-sub">Manage website links, categories, and dashboard content</p>
+        </div>
+
+        <!-- Admin Tab Navigation -->
+        <div class="admin-tabs">
+          <button class="admin-tab-btn active" onclick="showAdminTab('links',this)">🔗 Manage Links</button>
+          <button class="admin-tab-btn" onclick="showAdminTab('categories',this)">📂 Categories</button>
+          <button class="admin-tab-btn" onclick="showAdminTab('stats',this)">📊 Statistics</button>
+          <button class="admin-tab-btn" onclick="showAdminTab('import',this)">📥 Import / Export</button>
+        </div>
+
+        <!-- ─── TAB: Manage Links ─── -->
+        <div class="admin-tab-content active" id="admin-tab-links">
+
+          <div class="admin-form-card glass-card">
+            <div class="admin-form-header">
+              <h3 id="adminFormTitle">➕ Add New Website Link</h3>
+              <p style="color:var(--muted);font-size:13px;margin-top:4px">Fill in the details to add a portal to any category</p>
+            </div>
+            <div class="admin-form-grid">
+              <div class="admin-field">
+                <label>Website Name *</label>
+                <input type="text" id="adminName" placeholder="e.g. DigiLocker" class="admin-input" oninput="updatePreview()"/>
+              </div>
+              <div class="admin-field">
+                <label>Website URL *</label>
+                <input type="url" id="adminUrl" placeholder="https://example.com" class="admin-input"/>
+              </div>
+              <div class="admin-field">
+                <label>Icon (Emoji) *</label>
+                <div style="position:relative">
+                  <input type="text" id="adminIcon" placeholder="🌐" class="admin-input emoji-input" maxlength="4" oninput="updatePreview()"/>
+                  <div class="emoji-suggestions">
+                    🌐 🏛️ 🏦 🎓 🛠️ 🤖 📧 📄 🔒 💳 📱 🧠 💬 ✨ 🔍 🎨 📚 💰 🧾 👷 🚆 🛂 ⭐ 🔗 📊 🗂️ 🌍 🏥 ⚖️ 🎯 🔬 📰 🎵 🛒 🏠 ✈️
+                  </div>
+                </div>
+              </div>
+              <div class="admin-field">
+                <label>Category *</label>
+                <select id="adminCategory" class="admin-input admin-select">
+                  <option value="government">🏛️ Government</option>
+                  <option value="banking">🏦 Banking</option>
+                  <option value="education">🎓 Education</option>
+                  <option value="tools">🛠️ Tools</option>
+                  <option value="ai">🤖 AI Hub</option>
+                  <option value="daily">🌐 Daily Use</option>
+                </select>
+              </div>
+              <div class="admin-field">
+                <label>Card Color</label>
+                <div class="color-pick-row">
+                  <input type="color" id="adminColor" value="#4fc3f7" class="admin-color-input" oninput="updatePreview()"/>
+                  <div class="color-presets">
+                    <span class="color-dot" style="background:#4fc3f7" onclick="setColor('#4fc3f7')"></span>
+                    <span class="color-dot" style="background:#66bb6a" onclick="setColor('#66bb6a')"></span>
+                    <span class="color-dot" style="background:#ffa726" onclick="setColor('#ffa726')"></span>
+                    <span class="color-dot" style="background:#ef5350" onclick="setColor('#ef5350')"></span>
+                    <span class="color-dot" style="background:#ab47bc" onclick="setColor('#ab47bc')"></span>
+                    <span class="color-dot" style="background:#26c6da" onclick="setColor('#26c6da')"></span>
+                    <span class="color-dot" style="background:#ff7043" onclick="setColor('#ff7043')"></span>
+                    <span class="color-dot" style="background:#5c6bc0" onclick="setColor('#5c6bc0')"></span>
+                  </div>
+                </div>
+              </div>
+              <div class="admin-field">
+                <label>Description (optional)</label>
+                <input type="text" id="adminDesc" placeholder="Short description…" class="admin-input"/>
+              </div>
+            </div>
+
+            <div class="admin-preview-section">
+              <label>Live Card Preview</label>
+              <div class="admin-preview-wrap">
+                <div class="portal-card preview-card" id="previewCard" style="--card-color:#4fc3f7;pointer-events:none;animation:none;">
+                  <div class="card-dot"></div>
+                  <div class="card-shadow"></div>
+                  <div class="card-icon" id="previewIcon">🌐</div>
+                  <div class="card-name" id="previewName">Website Name</div>
+                  <button class="fav-btn" style="pointer-events:none">⭐</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Hidden field for editing -->
+            <input type="hidden" id="adminEditId" value=""/>
+
+            <div class="admin-form-actions">
+              <button class="btn-primary" onclick="adminSaveLink()" id="adminSaveBtn"><span>💾 Save Link</span></button>
+              <button class="btn-ghost" onclick="adminClearForm()">✕ Clear</button>
+            </div>
+            <div id="adminFormMsg" class="admin-msg"></div>
+          </div>
+
+          <!-- Links Table -->
+          <div class="admin-links-section">
+            <div class="admin-links-header">
+              <h3>📋 All Website Links <span id="adminLinkCount" class="admin-count-badge">0</span></h3>
+              <div class="admin-filter-row">
+                <input type="text" id="adminSearch" placeholder="🔍 Search links…" class="admin-input admin-search-input" oninput="filterAdminLinks()"/>
+                <select id="adminFilterCat" class="admin-input admin-select-sm" onchange="filterAdminLinks()">
+                  <option value="">All Categories</option>
+                  <option value="government">Government</option>
+                  <option value="banking">Banking</option>
+                  <option value="education">Education</option>
+                  <option value="tools">Tools</option>
+                  <option value="ai">AI Hub</option>
+                  <option value="daily">Daily Use</option>
+                </select>
+              </div>
+            </div>
+            <div class="admin-table-wrap glass-card">
+              <table class="admin-links-table">
+                <thead>
+                  <tr>
+                    <th>Icon</th>
+                    <th>Name</th>
+                    <th>URL</th>
+                    <th>Category</th>
+                    <th>Color</th>
+                    <th>Source</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminLinksBody"></tbody>
+              </table>
+              <div id="adminTableEmpty" class="admin-table-empty" style="display:none">
+                <span>🔍 No links found matching your search.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─── TAB: Categories ─── -->
+        <div class="admin-tab-content" id="admin-tab-categories">
+          <div class="cat-manager-grid">
+            <div class="glass-card admin-cat-form">
+              <h3>➕ Add New Category</h3>
+              <p style="color:var(--muted);font-size:13px;margin:6px 0 20px">Create a custom category for your links</p>
+              <div class="admin-field">
+                <label>Category Name *</label>
+                <input type="text" id="catName" placeholder="e.g. Health Services" class="admin-input"/>
+              </div>
+              <div class="admin-field">
+                <label>Icon (Emoji) *</label>
+                <input type="text" id="catIcon" placeholder="🏥" class="admin-input emoji-input" maxlength="4"/>
+              </div>
+              <div class="admin-field">
+                <label>Page Subtitle</label>
+                <input type="text" id="catDesc" placeholder="Short description of this category" class="admin-input"/>
+              </div>
+              <button class="btn-primary" onclick="addCategory()" style="margin-top:8px"><span>➕ Add Category</span></button>
+              <div id="catFormMsg" class="admin-msg"></div>
+            </div>
+            <div class="glass-card admin-cat-list">
+              <h3>📂 All Categories</h3>
+              <p style="color:var(--muted);font-size:13px;margin:6px 0 16px">Built-in categories cannot be deleted. Custom ones can.</p>
+              <div id="categoryList"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─── TAB: Statistics ─── -->
+        <div class="admin-tab-content" id="admin-tab-stats">
+          <div class="stats-overview" id="adminStatsOverview"></div>
+          <div class="admin-stats-grid">
+            <div class="glass-card admin-stat-card">
+              <h3>📈 Links Per Category</h3>
+              <div id="statsBarChart" class="bar-chart-container"></div>
+            </div>
+            <div class="glass-card admin-stat-card">
+              <h3>🕐 Recently Added (Custom)</h3>
+              <div id="statsRecentAdded"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─── TAB: Import / Export ─── -->
+        <div class="admin-tab-content" id="admin-tab-import">
+          <div class="import-export-grid">
+
+            <div class="glass-card ie-card">
+              <div class="ie-icon">📤</div>
+              <h3>Export All Links</h3>
+              <p>Download all your portal links as a JSON file for backup or sharing.</p>
+              <button class="btn-primary" onclick="exportLinks()"><span>📤 Export JSON</span></button>
+              <button class="btn-ghost" onclick="exportCSV()" style="margin-top:10px">📊 Export CSV</button>
+            </div>
+
+            <div class="glass-card ie-card">
+              <div class="ie-icon">📥</div>
+              <h3>Import Links</h3>
+              <p>Upload a JSON file to add portal links. Existing links are kept safe.</p>
+              <label class="btn-primary import-file-label" style="cursor:pointer;display:inline-block;text-align:center">
+                <span>📂 Choose JSON File</span>
+                <input type="file" accept=".json" onchange="importLinks(event)" style="display:none"/>
+              </label>
+              <div id="importMsg" class="admin-msg" style="margin-top:10px"></div>
+            </div>
+
+            <div class="glass-card ie-card">
+              <div class="ie-icon">🗑️</div>
+              <h3>Reset Custom Links</h3>
+              <p>Remove all links you added and restore only the original built-in portals.</p>
+              <button class="btn-ghost btn-danger" onclick="resetToDefault()">⚠️ Reset Custom Links</button>
+            </div>
+
+            <div class="glass-card ie-card">
+              <div class="ie-icon">⚡</div>
+              <h3>Quick Bulk Add</h3>
+              <p>Paste multiple links in JSON format to add them all at once.</p>
+              <textarea id="bulkJson" class="admin-input bulk-textarea" placeholder='[
+  {
+    "name": "Example Site",
+    "url": "https://example.com",
+    "icon": "🌐",
+    "category": "daily",
+    "color": "#4fc3f7"
+  }
+]'></textarea>
+              <button class="btn-primary" onclick="bulkAddLinks()" style="margin-top:10px"><span>⚡ Add All Links</span></button>
+              <div id="bulkMsg" class="admin-msg"></div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+      <!-- END ADMIN PAGE -->
+
+    </main>
+  </div>
+</div>
+
+<!-- AI CHAT MODAL -->
+<div class="modal-overlay" id="aiModal" onclick="closeAIModal(event)">
+  <div class="ai-chat-modal glass-card">
+    <div class="ai-chat-header">
+      <span>🤖 AI Assistant</span>
+      <button onclick="document.getElementById('aiModal').classList.remove('open')">✕</button>
+    </div>
+    <div class="ai-chat-messages" id="aiMessages">
+      <div class="ai-msg bot-msg">👋 Hello! I'm your SmartDash AI assistant. How can I help you navigate Indian government services, banking, or education today?</div>
+    </div>
+    <div class="ai-chat-input">
+      <input type="text" id="aiInput" placeholder="Ask me anything…" onkeydown="if(event.key==='Enter')sendAIMsg()"/>
+      <button onclick="sendAIMsg()">➤</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
